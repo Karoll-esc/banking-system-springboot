@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @Tag(name = "Usuarios", description = "Operaciones relacionadas con usuarios")
 @RestController
@@ -30,10 +31,6 @@ public class UsuarioController {
     }
 
     @Operation(summary = "Obtener usuario por ID", description = "Devuelve la información de un usuario específico por su ID.")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Usuario encontrado"),
-            @ApiResponse(responseCode = "404", description = "Usuario no encontrado")
-    })
     @GetMapping("/{id}")
     public ResponseEntity<UsuarioDTO> obtenerUsuarioPorId(@PathVariable Long id) {
         try {
@@ -45,10 +42,6 @@ public class UsuarioController {
     }
 
     @Operation(summary = "Crear un nuevo usuario", description = "Crea un usuario con los datos proporcionados.")
-    @ApiResponses({
-            @ApiResponse(responseCode = "201", description = "Usuario creado exitosamente"),
-            @ApiResponse(responseCode = "500", description = "Error al crear el usuario")
-    })
     @PostMapping
     public ResponseEntity<UsuarioDTO> crearUsuario(@RequestBody CreateUsuarioDTO crearUsuarioDTO) {
         try {
@@ -60,27 +53,20 @@ public class UsuarioController {
     }
 
     @Operation(summary = "Actualizar usuario", description = "Actualiza los datos de un usuario existente por su ID.")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Usuario actualizado correctamente"),
-            @ApiResponse(responseCode = "404", description = "Usuario no encontrado")
-    })
     @PutMapping("/{id}")
-    public ResponseEntity<UsuarioDTO> actualizarUsuario(
+    public ResponseEntity<?> actualizarUsuario(
             @PathVariable Long id,
             @RequestBody CreateUsuarioDTO datosActualizados) {
         try {
             UsuarioDTO usuarioActualizado = usuarioService.actualizarUsuario(id, datosActualizados);
             return ResponseEntity.ok(usuarioActualizado);
         } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body(Map.of("error", e.getMessage()));
         }
     }
 
     @Operation(summary = "Eliminar usuario", description = "Elimina un usuario por su ID.")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Usuario eliminado correctamente"),
-            @ApiResponse(responseCode = "404", description = "Usuario no encontrado")
-    })
     @DeleteMapping("/{id}")
     public ResponseEntity<String> eliminarUsuario(@PathVariable Long id) {
         try {

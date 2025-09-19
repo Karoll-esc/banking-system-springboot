@@ -1,6 +1,6 @@
 package com.sofka.banking.system.dto.response;
 
-import com.sofka.banking.system.entity.Usuario;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -17,4 +17,5 @@ public class UsuarioDTO {
     private String apellido;
     private String email;
     private String telefono;
+    private List<CuentaBancariaDTO> cuentasBancarias;
 }
