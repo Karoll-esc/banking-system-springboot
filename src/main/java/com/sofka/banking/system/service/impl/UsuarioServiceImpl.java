@@ -1,15 +1,19 @@
 package com.sofka.banking.system.service.impl;
 
-import com.sofka.banking.system.mapper.UsuarioMapper;
+import java.util.List;
+
+import com.sofka.banking.system.exception.usuario.CedulaAlreadyExistsException;
+import com.sofka.banking.system.exception.usuario.EmailAlreadyExistsException;
+import com.sofka.banking.system.exception.usuario.UsuarioNotFoundException;
+import org.springframework.stereotype.Service;
 import com.sofka.banking.system.dto.request.CreateUsuarioDTO;
+import com.sofka.banking.system.dto.request.UpdateUsuarioDTO;
 import com.sofka.banking.system.dto.response.UsuarioDTO;
 import com.sofka.banking.system.entity.Usuario;
+import com.sofka.banking.system.mapper.UsuarioMapper;
 import com.sofka.banking.system.repository.UsuarioRepository;
 import com.sofka.banking.system.service.UsuarioService;
 import lombok.AllArgsConstructor;
-import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 @AllArgsConstructor
@@ -27,11 +31,11 @@ public class UsuarioServiceImpl implements UsuarioService {
     public UsuarioDTO crearUsuario(CreateUsuarioDTO crearUsuarioDTO) {
 
         if (usuarioRepository.existsByCedula(crearUsuarioDTO.getCedula())) {
-            throw new RuntimeException();
+            throw new CedulaAlreadyExistsException(crearUsuarioDTO.getCedula());
         }
 
         if (usuarioRepository.existsByEmail(crearUsuarioDTO.getEmail())) {
-            throw new RuntimeException();
+            throw new EmailAlreadyExistsException(crearUsuarioDTO.getEmail());
         }
 
         Usuario nuevoUsuario = usuarioMapper.toEntity(crearUsuarioDTO);
@@ -43,14 +47,12 @@ public class UsuarioServiceImpl implements UsuarioService {
     @Override
     public UsuarioDTO obtenerUsuarioPorId(Long id) {
         Usuario usuario = usuarioRepository.findById(id)
-                .orElseThrow(() -> {
-                    return new RuntimeException("Usuario no encontrado");
-                });
+                .orElseThrow(() -> new UsuarioNotFoundException(id));
         return usuarioMapper.toDTO(usuario);
     }
 
     @Override
-    public UsuarioDTO actualizarUsuario(Long id, CreateUsuarioDTO datosActualizados) {
+    public UsuarioDTO actualizarUsuario(Long id, UpdateUsuarioDTO datosActualizados) {
 
         Usuario usuario = usuarioRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
@@ -70,6 +72,6 @@ public class UsuarioServiceImpl implements UsuarioService {
 
         usuarioRepository.deleteById(id);
 
-        return "Usuario desactivado exitosamente";
+        return "Usuario eliminado exitosamente";
     }
 }

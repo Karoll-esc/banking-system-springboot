@@ -1,6 +1,10 @@
 package com.sofka.banking.system.service.impl;
 
 import java.util.List;
+
+import com.sofka.banking.system.exception.cuentaBancaria.CuentaBancariaNotFoundException;
+import com.sofka.banking.system.exception.cuentaBancaria.NumeroCuentaAlreadyExistsException;
+import com.sofka.banking.system.exception.usuario.UsuarioNotFoundException;
 import org.springframework.stereotype.Service;
 import com.sofka.banking.system.dto.request.CreateCuentaBancariaDTO;
 import com.sofka.banking.system.dto.response.CuentaBancariaDTO;
@@ -22,10 +26,12 @@ public class CuentaBancariaServiceImpl implements CuentaBancariaService {
     @Override
     public CuentaBancariaDTO crearCuenta(CreateCuentaBancariaDTO dto) {
         if (cuentaBancariaRepository.existsByNumeroCuenta(dto.getNumeroCuenta())) {
-            throw new RuntimeException("El número de cuenta ya existe");
+            throw new NumeroCuentaAlreadyExistsException(dto.getNumeroCuenta());
         }
+
         Usuario usuario = usuarioRepository.findById(dto.getUsuarioId())
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+                .orElseThrow(() -> new UsuarioNotFoundException(dto.getUsuarioId()));
+
         CuentaBancaria cuenta = CuentaBancaria.builder().numeroCuenta(dto.getNumeroCuenta())
                 .saldoActual(dto.getSaldoActual()).usuario(usuario).build();
         CuentaBancaria guardada = cuentaBancariaRepository.save(cuenta);
@@ -41,7 +47,7 @@ public class CuentaBancariaServiceImpl implements CuentaBancariaService {
     @Override
     public CuentaBancariaDTO consultarSaldo(Long cuentaId) {
         CuentaBancaria cuenta = cuentaBancariaRepository.findById(cuentaId)
-                .orElseThrow(() -> new RuntimeException("Cuenta no encontrada"));
+                .orElseThrow(() -> new CuentaBancariaNotFoundException(cuentaId));
         return cuentaBancariaMapper.toDTO(cuenta);
     }
 }

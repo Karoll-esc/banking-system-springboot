@@ -2,7 +2,9 @@ package com.sofka.banking.system.controller;
 
 import java.util.List;
 
+import com.sofka.banking.system.service.CuentaBancariaService;
 import com.sofka.banking.system.service.impl.CuentaBancariaServiceImpl;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,12 +22,12 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/cuentas")
 @RequiredArgsConstructor
 public class CuentaBancariaController {
-    private final CuentaBancariaServiceImpl cuentaBancariaService;
+    private final CuentaBancariaService cuentaBancariaService;
 
     @Operation(summary = "Crear cuenta bancaria",
             description = "Crea una nueva cuenta bancaria asociada a un usuario.")
     @PostMapping
-    public ResponseEntity<CuentaBancariaDTO> crearCuenta(@RequestBody CreateCuentaBancariaDTO CrearCuentaBancariaDTO) {
+    public ResponseEntity<CuentaBancariaDTO> crearCuenta(@Valid @RequestBody CreateCuentaBancariaDTO CrearCuentaBancariaDTO) {
         try {
             CuentaBancariaDTO nuevaCuenta = cuentaBancariaService.crearCuenta(CrearCuentaBancariaDTO);
             return ResponseEntity.status(HttpStatus.CREATED).body(nuevaCuenta);
@@ -36,7 +38,6 @@ public class CuentaBancariaController {
 
     @Operation(summary = "Obtener cuentas por usuario",
             description = "Devuelve todas las cuentas bancarias de un usuario.")
-    @ApiResponse(responseCode = "200", description = "Lista de cuentas obtenida correctamente")
     @GetMapping("/usuario/{usuarioId}")
     public ResponseEntity<List<CuentaBancariaDTO>> obtenerCuentasPorUsuario(@Parameter(
             description = "ID del usuario", required = true) @PathVariable Long usuarioId) {
@@ -46,9 +47,6 @@ public class CuentaBancariaController {
 
     @Operation(summary = "Consultar saldo de cuenta",
             description = "Devuelve el saldo actual de una cuenta bancaria.")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Saldo consultado correctamente"),
-            @ApiResponse(responseCode = "404", description = "Cuenta no encontrada")})
     @GetMapping("/{cuentaId}/saldo")
     public ResponseEntity<CuentaBancariaDTO> consultarSaldo(
             @Parameter(description = "ID de la cuenta bancaria",

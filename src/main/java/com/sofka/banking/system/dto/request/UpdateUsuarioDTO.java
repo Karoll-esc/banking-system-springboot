@@ -1,6 +1,5 @@
 package com.sofka.banking.system.dto.request;
 
-import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
@@ -14,15 +13,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class CreateUsuarioDTO {
-
-    @NotBlank(message = "La cédula es obligatoria")
-    @Pattern(regexp = "^[0-9]{8,10}$", message = "La cédula debe tener entre 8 y 10 dígitos")
-    private String cedula;
-
-    @Schema(description = "Nombre completo del usuario",
-            example = "Juan Pérez",
-            requiredMode = Schema.RequiredMode.REQUIRED)
+public class UpdateUsuarioDTO {
     @NotBlank(message = "El nombre es obligatorio")
     @Size(min = 2, max = 50, message = "El nombre debe tener entre 2 y 50 caracteres")
     @Pattern(regexp = "^[a-zA-ZáéíóúÁÉÍÓÚñÑ\\s]+$", message = "El nombre solo puede contener letras y espacios")

@@ -1,6 +1,8 @@
 package com.sofka.banking.system.controller;
 
 import java.util.List;
+
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -27,7 +29,7 @@ public class TransaccionController {
             description = "Registra un depósito o retiro en una cuenta bancaria y actualiza el saldo.")
     @PostMapping
     public ResponseEntity<TransaccionDTO> registrarTransaccion(
-            @RequestBody CreateTransaccionDTO dto) {
+            @Valid @RequestBody CreateTransaccionDTO dto) {
         TransaccionDTO transaccion = transaccionService.registrarTransaccion(dto);
         return new ResponseEntity<>(transaccion, HttpStatus.CREATED);
     }
