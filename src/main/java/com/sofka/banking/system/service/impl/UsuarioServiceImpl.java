@@ -6,6 +6,7 @@ import com.sofka.banking.system.exception.usuario.CedulaAlreadyExistsException;
 import com.sofka.banking.system.exception.usuario.EmailAlreadyExistsException;
 import com.sofka.banking.system.exception.usuario.UsuarioNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import com.sofka.banking.system.dto.request.CreateUsuarioDTO;
 import com.sofka.banking.system.dto.request.UpdateUsuarioDTO;
 import com.sofka.banking.system.dto.response.UsuarioDTO;
@@ -55,7 +56,7 @@ public class UsuarioServiceImpl implements UsuarioService {
     public UsuarioDTO actualizarUsuario(Long id, UpdateUsuarioDTO datosActualizados) {
 
         Usuario usuario = usuarioRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+                .orElseThrow(() -> new UsuarioNotFoundException(id));
 
         usuarioMapper.updateEntityFromDTO(usuario, datosActualizados);
 
@@ -65,12 +66,17 @@ public class UsuarioServiceImpl implements UsuarioService {
     }
 
     @Override
+    @Transactional
     public String eliminarUsuario(Long id) {
-        if (!usuarioRepository.existsById(id)) {
-            throw new RuntimeException("Usuario no encontrado");
-        }
+        // Verificar que el usuario existe y obtenerlo con sus relaciones
+        Usuario usuario = usuarioRepository.findById(id)
+                .orElseThrow(() -> new UsuarioNotFoundException(id));
 
-        usuarioRepository.deleteById(id);
+        // Debido a la configuración de cascada (CascadeType.ALL) en las relaciones,
+        // al eliminar el usuario, automáticamente se eliminarán:
+        // 1. Sus cuentas bancarias (OneToMany con cascade = ALL)
+        // 2. Las transacciones de esas cuentas (OneToMany en CuentaBancaria con cascade = ALL)
+        usuarioRepository.delete(usuario);
 
         return "Usuario eliminado exitosamente";
     }
