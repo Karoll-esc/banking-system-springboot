@@ -1,15 +1,14 @@
 package com.sofka.banking.system.service.impl;
 
 import java.util.List;
-
-import com.sofka.banking.system.exception.cuentaBancaria.CuentaBancariaNotFoundException;
-import com.sofka.banking.system.exception.cuentaBancaria.NumeroCuentaAlreadyExistsException;
-import com.sofka.banking.system.exception.usuario.UsuarioNotFoundException;
 import org.springframework.stereotype.Service;
 import com.sofka.banking.system.dto.request.CreateCuentaBancariaDTO;
 import com.sofka.banking.system.dto.response.CuentaBancariaDTO;
 import com.sofka.banking.system.entity.CuentaBancaria;
 import com.sofka.banking.system.entity.Usuario;
+import com.sofka.banking.system.exception.cuentaBancaria.CuentaBancariaNotFoundException;
+import com.sofka.banking.system.exception.cuentaBancaria.NumeroCuentaAlreadyExistsException;
+import com.sofka.banking.system.exception.usuario.UsuarioNotFoundException;
 import com.sofka.banking.system.mapper.CuentaBancariaMapper;
 import com.sofka.banking.system.repository.CuentaBancariaRepository;
 import com.sofka.banking.system.repository.UsuarioRepository;
@@ -49,5 +48,15 @@ public class CuentaBancariaServiceImpl implements CuentaBancariaService {
         CuentaBancaria cuenta = cuentaBancariaRepository.findById(cuentaId)
                 .orElseThrow(() -> new CuentaBancariaNotFoundException(cuentaId));
         return cuentaBancariaMapper.toDTO(cuenta);
+    }
+
+    @Override
+    public String eliminarCuenta(Long cuentaId) {
+        if (!cuentaBancariaRepository.existsById(cuentaId)) {
+            throw new CuentaBancariaNotFoundException(cuentaId);
+        }
+
+        cuentaBancariaRepository.deleteById(cuentaId);
+        return "Cuenta eliminada exitosamente";
     }
 }

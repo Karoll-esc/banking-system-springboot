@@ -10,4 +10,6 @@ public interface CuentaBancariaService {
     List<CuentaBancariaDTO> obtenerCuentasPorUsuario(Long usuarioId);
 
     CuentaBancariaDTO consultarSaldo(Long cuentaId);
+
+    String eliminarCuenta(Long cuentaId);
 }
