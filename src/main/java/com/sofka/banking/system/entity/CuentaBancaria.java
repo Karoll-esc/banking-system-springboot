@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @Entity
 @Table(name = "cuentas_bancarias")
@@ -28,4 +29,10 @@ public class CuentaBancaria {
     @ManyToOne()
     @JoinColumn(name = "usuario_id")
     private Usuario usuario;
+
+    @OneToMany(mappedBy = "cuentaBancaria", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Transaccion> transacciones;
+
+    @OneToMany(mappedBy = "cuentaDestino", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Transaccion> transaccionesComoDestino;
 }
