@@ -29,6 +29,6 @@ public interface UsuarioMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "cedula", ignore = true)
     @Mapping(target = "cuentasBancarias", ignore = true)
-    //@Mapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    @Mapping(target = ".", source = ".", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     void updateEntityFromDTO(@MappingTarget Usuario usuario, UpdateUsuarioDTO dto);
 }
