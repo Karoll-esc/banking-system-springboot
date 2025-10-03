@@ -9,6 +9,7 @@ import com.sofka.banking.system.entity.Transaccion;
 @Mapper(componentModel = "spring")
 public interface TransaccionMapper {
     @Mapping(target = "cuentaBancariaId", source = "cuentaBancaria.id")
+    @Mapping(target = "cuentaDestinoId", source = "cuentaDestino.id")
     TransaccionDTO toDTO(Transaccion transaccion);
 
     List<TransaccionDTO> toDTOList(List<Transaccion> transacciones);
