@@ -12,4 +12,6 @@ public interface CuentaBancariaService {
     CuentaBancariaDTO consultarSaldo(Long cuentaId);
 
     String eliminarCuenta(Long cuentaId);
+
+    CuentaBancariaDTO buscarPorNumeroCuenta(String numeroCuenta);
 }

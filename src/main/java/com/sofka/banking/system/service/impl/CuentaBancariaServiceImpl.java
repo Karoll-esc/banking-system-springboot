@@ -59,4 +59,12 @@ public class CuentaBancariaServiceImpl implements CuentaBancariaService {
         cuentaBancariaRepository.deleteById(cuentaId);
         return "Cuenta eliminada exitosamente";
     }
+
+    @Override
+    public CuentaBancariaDTO buscarPorNumeroCuenta(String numeroCuenta) {
+        CuentaBancaria cuenta = cuentaBancariaRepository.findByNumeroCuenta(numeroCuenta)
+                .orElseThrow(() -> new CuentaBancariaNotFoundException(
+                        "Cuenta bancaria con número " + numeroCuenta + " no encontrada"));
+        return cuentaBancariaMapper.toDTO(cuenta);
+    }
 }

@@ -22,13 +22,16 @@ public interface UsuarioMapper {
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "cuentasBancarias", ignore = true)
+    @Mapping(target = "password", ignore = true) // Password se establecerá en el service
     Usuario toEntity(CreateUsuarioDTO crearUsuarioDTO);
 
     List<UsuarioDTO> toDTOList(List<Usuario> usuarios);
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "cedula", ignore = true)
+    @Mapping(target = "password", ignore = true) // Password se actualiza por endpoint separado
     @Mapping(target = "cuentasBancarias", ignore = true)
-    @Mapping(target = ".", source = ".", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    @Mapping(target = ".", source = ".",
+            nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     void updateEntityFromDTO(@MappingTarget Usuario usuario, UpdateUsuarioDTO dto);
 }

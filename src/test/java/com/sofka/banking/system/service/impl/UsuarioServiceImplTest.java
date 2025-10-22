@@ -12,17 +12,16 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
-
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import com.sofka.banking.system.dto.request.CreateUsuarioDTO;
 import com.sofka.banking.system.dto.request.UpdateUsuarioDTO;
 import com.sofka.banking.system.dto.response.UsuarioDTO;
@@ -41,6 +40,9 @@ class UsuarioServiceImplTest {
 
         @Mock
         private UsuarioMapper usuarioMapper;
+
+        @Mock
+        private PasswordEncoder passwordEncoder;
 
         @InjectMocks
         private UsuarioServiceImpl usuarioService;
@@ -62,7 +64,7 @@ class UsuarioServiceImplTest {
 
                 createUsuarioDTO = CreateUsuarioDTO.builder().cedula("12345678").nombre("Juan")
                                 .apellido("Pérez").email("juan@email.com").telefono("1234567890")
-                                .build();
+                                .password("Password123!").build();
 
                 updateUsuarioDTO = UpdateUsuarioDTO.builder().nombre("Juan Carlos")
                                 .apellido("Pérez García").email("juan.carlos@email.com")
@@ -77,6 +79,8 @@ class UsuarioServiceImplTest {
                 when(usuarioRepository.existsByEmail(createUsuarioDTO.getEmail()))
                                 .thenReturn(false);
                 when(usuarioMapper.toEntity(createUsuarioDTO)).thenReturn(usuario);
+                when(passwordEncoder.encode(createUsuarioDTO.getPassword()))
+                                .thenReturn("$2a$10$hashedPassword");
                 when(usuarioRepository.save(usuario)).thenReturn(usuario);
                 when(usuarioMapper.toDTO(usuario)).thenReturn(usuarioDTO);
 
@@ -165,9 +169,9 @@ class UsuarioServiceImplTest {
                                 .apellido("García").email("maria@email.com").telefono("0987654321")
                                 .build();
 
-                UsuarioDTO usuarioDTO2 = UsuarioDTO.builder().id(2L).cedula("87654321").nombre("María")
-                                .apellido("García").email("maria@email.com").telefono("0987654321")
-                                .build();
+                UsuarioDTO usuarioDTO2 = UsuarioDTO.builder().id(2L).cedula("87654321")
+                                .nombre("María").apellido("García").email("maria@email.com")
+                                .telefono("0987654321").build();
 
                 List<Usuario> usuarios = Arrays.asList(usuario, usuario2);
                 List<UsuarioDTO> usuariosDTO = Arrays.asList(usuarioDTO, usuarioDTO2);
@@ -246,8 +250,7 @@ class UsuarioServiceImplTest {
                 when(usuarioRepository.findById(id)).thenReturn(Optional.empty());
 
                 // When
-                UsuarioNotFoundException exception = assertThrows(
-                                UsuarioNotFoundException.class,
+                UsuarioNotFoundException exception = assertThrows(UsuarioNotFoundException.class,
                                 () -> usuarioService.obtenerUsuarioPorId(id));
 
                 // Then
@@ -286,11 +289,14 @@ class UsuarioServiceImplTest {
                                 () -> assertNotNull(resultado, "El resultado no debe ser nulo"),
                                 () -> assertEquals(usuarioDTOActualizado.getId(), resultado.getId(),
                                                 "El ID debe coincidir"),
-                                () -> assertEquals(usuarioDTOActualizado.getNombre(), resultado.getNombre(),
+                                () -> assertEquals(usuarioDTOActualizado.getNombre(),
+                                                resultado.getNombre(),
                                                 "El nombre debe estar actualizado"),
-                                () -> assertEquals(usuarioDTOActualizado.getApellido(), resultado.getApellido(),
+                                () -> assertEquals(usuarioDTOActualizado.getApellido(),
+                                                resultado.getApellido(),
                                                 "El apellido debe estar actualizado"),
-                                () -> assertEquals(usuarioDTOActualizado.getEmail(), resultado.getEmail(),
+                                () -> assertEquals(usuarioDTOActualizado.getEmail(),
+                                                resultado.getEmail(),
                                                 "El email debe estar actualizado"));
 
                 verify(usuarioRepository).findById(id);
@@ -307,8 +313,7 @@ class UsuarioServiceImplTest {
                 when(usuarioRepository.findById(id)).thenReturn(Optional.empty());
 
                 // When
-                UsuarioNotFoundException exception = assertThrows(
-                                UsuarioNotFoundException.class,
+                UsuarioNotFoundException exception = assertThrows(UsuarioNotFoundException.class,
                                 () -> usuarioService.actualizarUsuario(id, updateUsuarioDTO));
 
                 // Then
@@ -329,14 +334,9 @@ class UsuarioServiceImplTest {
         void eliminarUsuario_ConIdExistente_DeberiaEliminarUsuario() {
                 // Given
                 Long id = 1L;
-                Usuario usuarioAEliminar = Usuario.builder()
-                                .id(id)
-                                .cedula("12345678")
-                                .nombre("Juan")
-                                .apellido("Pérez")
-                                .email("juan@email.com")
-                                .telefono("+573001234567")
-                                .build();
+                Usuario usuarioAEliminar = Usuario.builder().id(id).cedula("12345678")
+                                .nombre("Juan").apellido("Pérez").email("juan@email.com")
+                                .telefono("+573001234567").build();
                 when(usuarioRepository.findById(id)).thenReturn(Optional.of(usuarioAEliminar));
 
                 // When
@@ -361,8 +361,7 @@ class UsuarioServiceImplTest {
                 when(usuarioRepository.findById(id)).thenReturn(Optional.empty());
 
                 // When
-                UsuarioNotFoundException exception = assertThrows(
-                                UsuarioNotFoundException.class,
+                UsuarioNotFoundException exception = assertThrows(UsuarioNotFoundException.class,
                                 () -> usuarioService.eliminarUsuario(id));
 
                 // Then

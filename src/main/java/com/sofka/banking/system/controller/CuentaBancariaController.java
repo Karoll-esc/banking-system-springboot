@@ -66,4 +66,16 @@ public class CuentaBancariaController {
         String mensaje = cuentaBancariaService.eliminarCuenta(cuentaId);
         return ResponseEntity.ok(Map.of("message", mensaje));
     }
+
+    @Operation(summary = "Buscar cuenta por número",
+            description = "Busca una cuenta bancaria por su número de cuenta. Útil para realizar transferencias entre diferentes usuarios.")
+    @GetMapping("/numero/{numeroCuenta}")
+    public ResponseEntity<CuentaBancariaDTO> buscarPorNumeroCuenta(
+            @Parameter(description = "Número de cuenta bancaria a buscar",
+                    required = true,
+                    example = "1234567890")
+            @PathVariable String numeroCuenta) {
+        CuentaBancariaDTO cuenta = cuentaBancariaService.buscarPorNumeroCuenta(numeroCuenta);
+        return ResponseEntity.ok(cuenta);
+    }
 }
